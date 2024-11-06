@@ -4,35 +4,27 @@ using namespace std;
 
 void func(int N){
     vector<vector<int>> arr(N, vector<int>(N, 0));
-    int num = 1;
-    for(int i = 0; i < N / 2; i++){
-        // 가로 입력
-        for(int j = i; j < N - i; j++){
-            arr[i][j] = num;
-            num++;
-        }
+    
+    int dir_num = 3;	// 초기 이동 방향
+    int x = 0, y = 0;	// 초기 위치
+    // ( dx, dy ) = 동남서북 순서 -> 시계 방향 순
+    int dx[4] = { 1, 0, -1, 0 };
+    int dy[4] = { 0, -1, 0, 1 };
+    
+    for(int i = 1; i <= N * N; i++){
+        arr[x][y] = i;
         
-        // 세로 입력
-        for(int j = i + 1; j < N - i; j++){
-         	arr[j][N - 1 - i] = num;
-            num++;
-        }
+        int nx = x + dx[dir_num];
+    	int ny = y + dy[dir_num];
         
-        // 역 가로 입력
-        for(int j = N - 2 - i; j >= i; j--){
-            arr[N - 1 - i][j] = num;
-            num++;
+        if( 0 <= nx && nx < N && 0 <= ny && ny < N && arr[nx][ny] == 0){
+            x = nx;
+            y = ny;
+        } else{
+            dir_num = (dir_num + 1) % 4;
+            x += dx[dir_num];
+            y += dy[dir_num];
         }
-        
-        // 역 세로 입력
-        for(int j = N - 2 - i; j >= i + 1; j--){
-            arr[j][i] = num;
-            num++;
-        }
-    }
-    // N이 홀수인 경우
-    if(N % 2 == 1){
-        arr[N/2][N/2] = num;
     }
     
     // 출력
