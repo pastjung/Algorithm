@@ -1,51 +1,39 @@
-#include <iostream>
+#include<iostream>
+#include<string>
+#include<algorithm>
 using namespace std;
-#include <cmath>
- 
-string str;
-int num, minimum, Maximum;
- 
-void change() {
-    num = 0;
-    for (int i = 0; i < str.length(); i++) {
-        num += (str[i] - '0') * pow(10, str.length() - 1 - i);
-    }
-}
- 
-void solve(int t)
-{
-    cin >> str;
-    change();
-    minimum = num;
-    Maximum = num;
- 
+
+void func(string str){
+ 	string minimum = str;
+    string maximum = str;
+    
     for (int i = 0; i < str.length() - 1; i++) {
         for (int j = i; j < str.length(); j++) {
-            if (i != 0 || str[j] != '0') {
-                swap(str[i], str[j]);
-                change();
-                if (num > Maximum)
-                    Maximum = num;
-                if (num < minimum)
-                    minimum = num;
+            if (i != 0 || str[j] != '0'){
+             	swap(str[i], str[j]);
+                if (str > maximum)
+                    maximum = str;
+                if (str < minimum)
+                    minimum = str;
                 swap(str[i], str[j]);
             }
         }
     }
- 
-    cout << "#" << t << " " << minimum << " " << Maximum << endl;
+    cout << minimum << ' ' << maximum << '\n';
 }
- 
-int main()
-{
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
- 
+
+int main(){
+ 	ios_base::sync_with_stdio(0);
+    cin.tie(0);
+    cout.tie(0);
+    
     int T;
     cin >> T;
-    for (int t = 1; t <= T; t++)
-    {
-        solve(t);
+    for(int t = 1; t <= T; t++){
+     	string str;
+        cin >> str;
+        cout << '#' << t << ' ';
+        func(str);
     }
     return 0;
 }
