@@ -1,64 +1,60 @@
 #include <string>
 #include <vector>
-#include <map>
-#include <set>
+#include <unordered_map>
 #include <algorithm>
 
 using namespace std;
 
-/*
-장르별 가장 많이 재생된 노래 2개씩
-1. 속한 노래 -> 장르 수록
-2. 가장 많이 재생된 노래 수록
-3. 재생 횟수가 동일하면 고유번호가 낮은 순
-*/
+bool compare (pair<int, int> left, pair<int, int> right){
+    if(left.first > right.first){
+        return true;
+    }else if(left.first == right.first){
+        if(left.second < right.second){
+            return true;
+        }
+    }
+    return false;
+}
 
 vector<int> solution(vector<string> genres, vector<int> plays) {
     vector<int> answer;
-    map<string, int> musicMap;  // 장르별 총 재생 횟수
-    map<string, multimap<int, int, greater<int>>> musicMultiMap;  // 장르별 노래 재생 횟수와 고유번호 (내림차순)
-    int N = genres.size();
-
+    unordered_map<string, int> sumMap;                      // 장르별 총 재생 횟수 { genres 장르 : 해당 장르의 노래 재생 횟수 총합 }
+    unordered_map<string, vector<pair<int, int>>> musicMap; // 장르별 노래 재생 횟수와 고유번호 (내림차순) { 장르 : { 노래 횟수 : 고유번호 } }
+    
     // 데이터 삽입
-    for(int i = 0; i < N; i++) {
-        string genre = genres[i];
-        int play = plays[i];
-
+    for (int i = 0; i < genres.size(); i++) {
         // 장르별 총 재생 횟수 업데이트
-        musicMap[genre] += play;
-
+        sumMap[genres[i]] += plays[i];
+        
         // 장르별 노래 재생 횟수와 고유번호 저장
-        musicMultiMap[genre].insert({play, i});
+        musicMap[genres[i]].push_back({plays[i], i});
     }
-
-    // 총 재생 횟수에 따라 장르 정렬
-    vector<pair<string, int>> genreList;
-    for (const auto& entry : musicMap) {
-        genreList.push_back(entry);
+    
+    // 재생 수에 따라 장르를 정렬하기 위한 전처리 - vector 생성
+    vector<pair<int, string>> sortedGenre; // { 재생횟수 : 장르 }
+    for (auto music : sumMap) {
+        sortedGenre.push_back({music.second, music.first});
     }
-
-    // 장르별로 가장 많이 재생된 노래 2개씩 뽑기
-    sort(genreList.begin(), genreList.end(), [](const pair<string, int>& a, const pair<string, int>& b) {
-        return a.second > b.second;  // 총 재생 횟수 내림차순
-    });
-
-    // 각 장르에 대해 상위 2개 노래를 뽑아 결과에 추가
-    for (const auto& genreEntry : genreList) {
-        string genre = genreEntry.first;
-        auto& songs = musicMultiMap[genre];
-        auto it = songs.begin();
-
-        // 가장 많이 재생된 노래 1개
-        if (it != songs.end()) {
-            answer.push_back(it->second);
-            ++it;
-        }
-        // 두 번째로 많이 재생된 노래 1개
-        if (it != songs.end()) {
-            answer.push_back(it->second);
+    
+    // 장르별 재생 횟수를 기준으로 오름차순 정렬 : 가장 많이 재생된 장르부터 순차적으로 처리하기 위함
+    stable_sort(sortedGenre.begin(), sortedGenre.end());
+    
+    // 장르별 상위 2개 음악 고르기
+    while (sortedGenre.size() > 0) {
+        pair<int, string> genre = sortedGenre.back(); // 재생횟수가 가장 많은 장르
+        sortedGenre.pop_back();
+        
+        vector<pair<int, int>> findTopTwo = musicMap[genre.second]; // 재생횟수가 가장 많은 장르의 노래들
+        
+        // 해당 장르의 노래들을 key와 value를 사용해 정렬
+        sort(findTopTwo.begin(), findTopTwo.end(), compare);
+        
+        // 상위 2개 음악 선택
+        answer.push_back(findTopTwo[0].second);
+        if(findTopTwo.size() > 1){
+            answer.push_back(findTopTwo[1].second);
         }
     }
 
     return answer;
 }
-
