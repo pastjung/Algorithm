@@ -1,5 +1,5 @@
-#include <iostream>
 #include <vector>
+#include <set>
 using namespace std;
 
 // key : value = 번호 : 순서
@@ -8,19 +8,16 @@ int solution(vector<int> nums)
     int answer = 0;    
     int N = nums.size() / 2;
     
-    vector<bool> isNums(200000, false);
-    for(int n : nums) {
-        isNums[n] = true;
+    set<int> isNums;
+    for(int i = 0; i < nums.size(); i++){
+        isNums.insert(nums[i]);
     }
     
-    for(bool isNum : isNums){
-        if(isNum) answer++;
+    if(isNums.size() <= N){
+        answer = isNums.size();
+    } else {
+        answer = N;
     }
     
-    if(answer <= N) {
-        return answer;
-    }
-    else{
-        return N;
-    }
+    return answer;
 }
