@@ -1,30 +1,24 @@
 #include <string>
 #include <vector>
-
 using namespace std;
 
 vector<int> solution(vector<int> progresses, vector<int> speeds) {
     vector<int> answer;
-    
-    int idx = 0;    // 기능 개선 작업중인 위치
-    for(int time = 1; time <= 100; time++){
-        if(idx > progresses.size()){
-            break;
-        }
-        
-        int count = 0;  // 동일한 배포에 완료된 기능의 수
-        while(progresses[idx] + (speeds[idx] * time) >= 100){
-            idx++;            
-            if(idx > progresses.size()){
-                break;
-            }
-            count++;
-        }
-        
-        if(count != 0){
-            answer.push_back(count);    
-        }
+
+    int day;
+    int max_day = 0;
+    for (int i = 0; i < progresses.size(); ++i)
+    {
+        day = (99 - progresses[i]) / speeds[i] + 1;
+
+        if (answer.empty() || max_day < day)
+            answer.push_back(1);
+        else
+            ++answer.back();
+
+        if (max_day < day)
+            max_day = day;
     }
-    
+
     return answer;
 }
