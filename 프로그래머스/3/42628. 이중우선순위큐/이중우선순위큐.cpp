@@ -1,11 +1,11 @@
 #include <string>
 #include <vector>
-#include <algorithm>
+#include <set>
 using namespace std;
 
 vector<int> solution(vector<string> operations) {
     vector<int> answer;
-    vector<int> doublePriorityQueue;
+    multiset<int> doublePriorityQueue;
     
     for(string str : operations){
         char command = str[0];
@@ -13,11 +13,7 @@ vector<int> solution(vector<string> operations) {
         
         if(command == 'I'){
             // 숫자 삽입
-            doublePriorityQueue.push_back(num);
-            
-            // 정렬
-            stable_sort(doublePriorityQueue.begin(), doublePriorityQueue.end());
-            
+            doublePriorityQueue.insert(num);            
         } else if(command == 'D'){
             // 큐가 비어 있는 경우
             if(doublePriorityQueue.empty()){
@@ -26,7 +22,8 @@ vector<int> solution(vector<string> operations) {
             
             if(num == 1){
                 // 최댓값 삭제
-                doublePriorityQueue.pop_back();
+                // 이때 erase는 const_iterator 또는 특정 값만 받기 때문에 역방향 반복자를 반환하는 rbegin()은 사용 불가
+                doublePriorityQueue.erase(--doublePriorityQueue.end()); 
             } else {
                 // 최솟값 삭제
                 doublePriorityQueue.erase(doublePriorityQueue.begin());
@@ -39,8 +36,8 @@ vector<int> solution(vector<string> operations) {
         answer.push_back(0);
         answer.push_back(0);
     } else {
-        answer.push_back(doublePriorityQueue.back());
-        answer.push_back(doublePriorityQueue.front());
+        answer.push_back(*doublePriorityQueue.rbegin());
+        answer.push_back(*doublePriorityQueue.begin());
     }
     
     return answer;
