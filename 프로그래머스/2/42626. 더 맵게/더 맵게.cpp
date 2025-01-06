@@ -7,11 +7,7 @@ using namespace std;
 
 int solution(vector<int> scoville, int K) {
     int answer = 0;
-    priority_queue<int, vector<int>, greater<int>> minHeap;
-    
-    for(int s : scoville){
-        minHeap.push(s);
-    }
+    priority_queue<int, vector<int>, greater<int>> minHeap(scoville.begin(), scoville.end());
     
     while(minHeap.top() < K){
         if(minHeap.size() == 1){
