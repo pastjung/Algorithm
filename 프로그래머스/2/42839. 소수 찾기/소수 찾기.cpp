@@ -17,24 +17,26 @@ bool isPrime(int num) {
     return true;
 }
 
-int solution(string numbers) {
-    int answer = 0;
-    set<int> primeNums; // 중복 제거를 위한 set
-    
-    for(int i = 1; i <= numbers.size(); i++){
-        string temp = numbers;
-        sort(temp.begin(), temp.end());
-        do{
-            string subStr = temp.substr(0, i);  // 부분 문자열 생성
-            primeNums.insert(stoi(subStr));
-        } while(next_permutation(temp.begin(), temp.end()));    // 순열 생성
-    }
-    
-    for (int num : primeNums) {
+// 백트래킹을 통한 소수 조합 찾기
+void findPrimes(const string& numbers, string current, set<int>& primeNums, vector<bool>& visited) {
+    if (!current.empty()) {
+        int num = stoi(current);
         if (isPrime(num)) {
-            answer++;
+            primeNums.insert(num); // 소수일 경우 집합에 추가
         }
     }
-    
-    return answer;
+
+    for (int i = 0; i < numbers.size(); ++i) {
+        if (visited[i]) continue; // 이미 사용된 숫자는 무시
+        visited[i] = true; // 숫자를 사용함
+        findPrimes(numbers, current + numbers[i], primeNums, visited); // 백트래킹 호출
+        visited[i] = false; // 백트래킹 후 숫자 사용 해제
+    }
+}
+
+int solution(string numbers) {
+    set<int> primeNums; // 중복 제거를 위한 set
+    vector<bool> visited(numbers.size(), false); // 방문 여부 확인
+    findPrimes(numbers, "", primeNums, visited); // 모든 조합 찾기
+    return primeNums.size(); // 유일한 소수의 개수 반환
 }
