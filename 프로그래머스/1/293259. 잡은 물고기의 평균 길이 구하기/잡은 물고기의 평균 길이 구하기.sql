@@ -1,0 +1,14 @@
+-- 코드를 작성해주세요
+WITH FISH AS (
+    SELECT
+        CASE
+            WHEN LENGTH IS NULL THEN 10
+            ELSE LENGTH
+        END AS LENGTH
+    FROM
+        FISH_INFO
+)
+SELECT
+    ROUND(AVG(LENGTH), 2) AS AVERAGE_LENGTH
+FROM
+    FISH
