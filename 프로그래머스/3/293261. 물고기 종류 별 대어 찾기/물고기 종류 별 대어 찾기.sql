@@ -1,26 +1,21 @@
 -- 코드를 작성해주세요
-WITH MAXFISH AS (
-    SELECT
-        FISH_TYPE,
-        MAX(LENGTH) AS MAX_LENGTH
-    FROM
-        FISH_INFO
-        JOIN FISH_NAME_INFO
-        USING(FISH_TYPE)
-    GROUP BY
-        FISH_TYPE
-)
 SELECT
     ID,
     FISH_NAME,
-    MAX_LENGTH AS LENGTH
+    LENGTH
 FROM
     FISH_INFO
     JOIN FISH_NAME_INFO
     USING(FISH_TYPE)
-    JOIN MAXFISH
-    USING(FISH_TYPE)
 WHERE
-    LENGTH = MAX_LENGTH
+    (FISH_TYPE, LENGTH) IN (
+    SELECT
+        FISH_TYPE,
+        MAX(LENGTH)
+    FROM
+        FISH_INFO
+    GROUP BY
+        FISH_TYPE
+    )
 ORDER BY
     1 ASC;
