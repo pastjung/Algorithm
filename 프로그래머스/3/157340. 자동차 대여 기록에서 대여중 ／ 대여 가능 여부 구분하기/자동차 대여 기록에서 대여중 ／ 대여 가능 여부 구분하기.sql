@@ -11,7 +11,6 @@
 #     1 DESC
     
 -- 방법 2
-
 SELECT
     CAR_ID
     , IF(CAR_ID IN(
