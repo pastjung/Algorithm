@@ -22,5 +22,3 @@ GROUP BY
     1
 ORDER BY
     1 ASC;
-    
--- 사원별 성과금 정보
