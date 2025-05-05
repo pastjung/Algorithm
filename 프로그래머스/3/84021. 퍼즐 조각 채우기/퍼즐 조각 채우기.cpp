@@ -25,7 +25,7 @@ using namespace std;
 int dx[4] = { 1, 0, -1, 0 };
 int dy[4] = { 0, 1, 0, -1 };
 
-// 좌표를 (0, 0) 기준으로 정규화 및 정렬
+// 좌표를 (0, 0) 기준으로 정규화 및 정렬 -> BFS를 할 때 
 vector<pair<int, int>> normalize(vector<pair<int, int>> shape){
     int minX = 50, minY = 50;
     for(auto [x, y] : shape){
@@ -105,13 +105,11 @@ int Match(const vector<vector<pair<int, int>>>& blanks, const vector<vector<pair
     vector<bool> used(pieces.size(), false);
     
     for(vector<pair<int, int>> blank : blanks){
-        // bool matched = false;
         for(int i = 0; i < pieces.size(); i++){
             if(used[i]) continue;
             if(check(blank, pieces[i])){
                 used[i] = true;
                 count += pieces[i].size();
-                // matched = true;
                 break;
             }
         }
