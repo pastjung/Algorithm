@@ -2,7 +2,6 @@
 #include <vector>
 #include <queue>
 #include <algorithm>
-#include <iostream>
 
 using namespace std;
 
@@ -51,19 +50,18 @@ vector<pair<int, int>> rotate(vector<pair<int, int>> shape) {
     return normalize(shape);
 }
 
-
 /*
 target : 찾아야할 값
 */
 vector<pair<int, int>> BFS(vector<vector<int>>& board, int x, int y, int target){
-    vector<pair<int, int>> temp;
+    vector<pair<int, int>> shape;
     queue<pair<int, int>> q;
     int bSize = board.size() - 1;
     
     // 초기 세팅
     board[y][x] = ( board[y][x] + 1 ) % 2;
     q.push({x, y});
-    temp.push_back({x, y});
+    shape.push_back({x, y});
     
     // BFS 탐색
     while(!q.empty()){
@@ -80,94 +78,70 @@ vector<pair<int, int>> BFS(vector<vector<int>>& board, int x, int y, int target)
             if(board[ny][nx] == target){
                 board[ny][nx] = ( board[ny][nx] + 1 ) % 2;
                 q.push({nx, ny});
-                temp.push_back({nx, ny});
+                shape.push_back({nx, ny});
             }
         }
     }
     
-    return normalize(temp);
+    return normalize(shape);
 }
 
 /*
 퍼즐 조각이 공간에 맞는지 확인
 -> piece의 도형을 회전시키면서 space에 대입해서 맞는지 확인 -> 공간이 맞으면 count + 1
 */
-bool check(vector<pair<int, int>> space, vector<pair<int, int>> piece){
+bool check(vector<pair<int, int>> blank, vector<pair<int, int>> piece){
     for (int i = 0; i < 4; i++) {
-        piece = normalize(piece);
-        if (piece == space) return true;
+        if (piece == blank) return true;
         piece = rotate(piece);
     }
     return false;
 }
 
 // 공간과 퍼즐 조각을 비교하여 최대한 채우기
-int Match(const vector<vector<vector<pair<int, int>>>>& space, const vector<vector<vector<pair<int, int>>>>& piece){
+int Match(const vector<vector<pair<int, int>>>& blanks, const vector<vector<pair<int, int>>>& pieces){
     int count = 0;
-
-    for(int size = 1; size <= 6; size++){
-        vector<bool> used(piece[size].size(), false);
-        
-        for(auto& sp : space[size]){
-            bool matched = false;
-            for(int i = 0; i < piece[size].size(); i++){
-                if (used[i]) continue;
-                if (check(sp, piece[size][i])) {
-                    used[i] = true;
-                    count += size;
-                    matched = true;
-                    break;
-                }
+    
+    vector<bool> used(pieces.size(), false);
+    
+    for(vector<pair<int, int>> blank : blanks){
+        // bool matched = false;
+        for(int i = 0; i < pieces.size(); i++){
+            if(used[i]) continue;
+            if(check(blank, pieces[i])){
+                used[i] = true;
+                count += pieces[i].size();
+                // matched = true;
+                break;
             }
         }
     }
-
+    
     return count;
 }
 
-// 도형 확인용 함수
-void print(const vector<vector<vector<pair<int, int>>>>& board);
-
-/*
-pair<int, int> : pixel 1개
-vector<pair<int, int>> : 도형 1개
-vector<vector<pair<int, int>>> : 같은 크기의 도형의 집합
-vector<vector<vector<pair<int, int>>>> : 인덱스를 크기로 사용
-*/
 int solution(vector<vector<int>> game_board, vector<vector<int>> table) {
-    vector<vector<vector<pair<int, int>>>> space(7);
-    vector<vector<vector<pair<int, int>>>> piece(7);
+    vector<vector<pair<int, int>>> blanks, pieces;
+    int size = table.size();
     
-    // board를 (0, 0) 부터 (n, n)까지 확인하면서 target과 일치하는 값이 존재하는지 확인
-    for(int y = 0; y < game_board.size(); y++){
-        for(int x = 0; x < game_board.size(); x++){
-            // game_board의 공간 위치와 공간의 개수 파악
+    // 빈 공간 찾기
+    for(int y = 0; y < size; y++){
+        for(int x = 0; x < size; x++){
             if(game_board[y][x] == 0){
-                vector<pair<int, int>> temp = BFS(game_board, x, y, 0);
-                space[temp.size()].push_back(temp);
+                blanks.push_back(BFS(game_board, x, y, 0));
             }
-            
-            // table의 퍼즐 조각의 모양과 공간 개수 파악
+        }
+    }
+    
+    // 퍼즐 조각 찾기
+    for(int y = 0; y < size; y++){
+        for(int x = 0; x < size; x++){
             if(table[y][x] == 1){
-                vector<pair<int, int>> temp = BFS(table, x, y, 1);
-                piece[temp.size()].push_back(temp);
+                pieces.push_back(BFS(table, x, y, 1));
             }
         }
     }
     
     // 공간의 개수가 동일한 piece를 space에 넣을 수 있는지 파악
-    return Match(space, piece);
-}
-
-void print(const vector<vector<vector<pair<int, int>>>>& board) {
-    for (int i = 1; i < board.size(); i++) {
-        cout << i << ":\n";
-        for (int j = 0; j < board[i].size(); j++) {
-            cout << "  [ ";
-            for (auto [x, y] : board[i][j]) {
-                cout << "{" << x << ", " << y << "} ";
-            }
-            cout << "]\n";
-        }
-    }
+    return Match(blanks, pieces);
 }
