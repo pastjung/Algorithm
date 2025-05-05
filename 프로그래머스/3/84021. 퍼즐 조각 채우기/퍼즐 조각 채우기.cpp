@@ -25,7 +25,7 @@ using namespace std;
 int dx[4] = { 1, 0, -1, 0 };
 int dy[4] = { 0, 1, 0, -1 };
 
-// 좌표를 (0, 0) 기준으로 정규화 및 정렬 -> BFS를 할 때 
+// 좌표를 (0, 0) 기준으로 정규화 및 정렬
 vector<pair<int, int>> normalize(vector<pair<int, int>> shape){
     int minX = 50, minY = 50;
     for(auto [x, y] : shape){
