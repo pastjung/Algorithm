@@ -6,9 +6,10 @@ using namespace std;
 
 /*
 풀이 방법
-- 구간 [i, j]의 최댓값 또는 최솟값 계산
-- 연산자가 "+"인 경우 : 전체 식의 최댓값을 구하기 위해 -> 부분 식의 최댓값 + 최댓값
-- 연산자가 "-"인 경우 : 전체 식의 최댓값을 구하기 위해 -> 부분 식의 최댓값 - 최솟값
+- 구간 [i, j]의 최댓값(dp_max)과 최솟값(dp_min)을 각각 계산
+- 점화식은 구간을 나누는 지점 k를 기준으로 나누어 생각
+    - 연산자가 "+"인 경우 : 전체 식의 최댓값을 구하기 위해 -> 부분 식의 최댓값 + 최댓값
+    - 연산자가 "-"인 경우 : 전체 식의 최댓값을 구하기 위해 -> 부분 식의 최댓값 - 최솟값
 */
 int solution(vector<string> arr) {
     int n = arr.size();
@@ -27,7 +28,7 @@ int solution(vector<string> arr) {
     // 길이 2 이상인 구간에 대한 DP
     for(int len = 2; len <= N; len++){
         for(int i = 0; i <= N - len; i++){
-            int j = i + len - 1;                // i : 구간의 시작, j : 구간의 끝, k : 구간 내 값
+            int j = i + len - 1;                // i : 구간의 시작, j : 구간의 끝, k : 구간 내 연산자 위치
             for(int k = i; k < j; k++){
                 string op = arr[k * 2 + 1];     // op : 연산자
                 if(op == "+"){
