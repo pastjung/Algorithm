@@ -1,36 +1,43 @@
-#include <string>
-#include <vector>
 #include <algorithm>
+#include <vector>
 
 using namespace std;
 
 vector<int> solution(vector<int> answers) {
     vector<int> answer;
     
-    vector<int> method1 = { 1, 2, 3, 4, 5 };
-    vector<int> method2 = { 2, 1, 2, 3, 2, 4, 2, 5 };
-    vector<int> method3 = { 3, 3, 1, 1, 2, 2, 4, 4, 5, 5 };
+    // 학생 답안 템플릿 선언
+    vector<vector<int>> studentAnswers = {
+        {1, 2, 3, 4, 5},
+        {2, 1, 2, 3, 2, 4, 2, 5},
+        {3, 3, 1, 1, 2, 2, 4, 4, 5, 5}
+    };
     
-    int answer1 = 0, answer2 = 0, answer3 = 0; // 정답 개수
+    // 학생 성적 배열 선언
+    vector<int> studentScores(3, 0);
     
-    for(int i = 0; i < answers.size(); i++){
-        if(answers[i] == method1[i % method1.size()]){
-            answer1++;
+    // 점수 채점
+    for(int i = 0; i < answers.size(); ++i){
+        if(answers[i] == studentAnswers[0][i % 5]){
+            studentScores[0]++;
         }
-        
-        if(answers[i] == method2[i % method2.size()]){
-            answer2++;
+        if(answers[i] == studentAnswers[1][i % 8]){
+            studentScores[1]++;
         }
-        
-        if(answers[i] == method3[i % method3.size()]){
-            answer3++;
+        if(answers[i] == studentAnswers[2][i % 10]){
+            studentScores[2]++;
         }
     }
     
-    int maxAnswer = max({answer1, answer2, answer3});
-    if (answer1 == maxAnswer) answer.push_back(1);
-    if (answer2 == maxAnswer) answer.push_back(2);
-    if (answer3 == maxAnswer) answer.push_back(3);
+    // 가장 높은 점수 추출
+    int maxScore = *max_element(studentScores.begin(), studentScores.end());
+    
+    // 가장 높은 점수를 가진 학생 추출
+    for(int i = 0; i < 3; ++i){
+        if(maxScore == studentScores[i]){
+            answer.push_back(i + 1);
+        }
+    }
     
     return answer;
 }
