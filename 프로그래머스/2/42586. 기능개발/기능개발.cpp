@@ -28,11 +28,6 @@ vector<int> solution(vector<int> progresses, vector<int> speeds) {
         if(task != 0){
             answer.push_back(task);
         }
-        
-        // 큐가 비어있을 경우 종료
-        if(q.empty()){
-            break;
-        }
 	    
 	    // 나머지 작업은 작업 진행도에 speeds를 더한 값을 다시 큐에 push 후 pop
         for(int i = 0; i < q.size(); i++){
