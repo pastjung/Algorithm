@@ -19,7 +19,7 @@ string solution(vector<string> cards1, vector<string> cards2, vector<string> goa
 	    
 	    // cards2의 현재 위치 < cards2.size() && cards2의 현재 위치의 값이 goal의 현재 위치와 동일한 경우
         if(idx2 < cards2.size() && cards2[idx2] == str){
-		    idx2++;     // card1의 현재 위치를 한칸 뒤로 이동
+		    idx2++;     // card2의 현재 위치를 한칸 뒤로 이동
             continue;   // 이후 작업 무시
         }
 	    
