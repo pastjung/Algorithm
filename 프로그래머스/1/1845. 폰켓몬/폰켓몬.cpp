@@ -2,21 +2,10 @@
 #include <unordered_set>
 using namespace std;
 
-int solution(vector<int> nums)
-{
-    int answer = 0;
-    int N = nums.size() / 2;
-    
-    unordered_set<int> isNums;
-    for(int i : nums){
-        isNums.insert(i);
-    }
-    
-    if(isNums.size() <= N){
-        answer = isNums.size();
-    } else {
-        answer = N;
-    }    
-    
-    return answer;
+int solution(vector<int> nums){
+    // 폰켓몬의 종류를 담을 해시 테이블 생성 및 초기화 -> 중복 제거
+    unordered_set<int> hash_set(nums.begin(), nums.end());
+
+    // N/2와 해시 테이블의 크기 비교 후 반환
+    return min(nums.size() / 2, hash_set.size());
 }
