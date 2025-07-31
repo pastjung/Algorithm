@@ -3,46 +3,65 @@
 #include <algorithm>
 using namespace std;
 
-// 특정 노드의 대표(parent)를 찾는 함수 (경로 압축 기법 사용)
-int getParent(vector<int>& tree, int node){
-    if(node == tree[node]){
+// 상호배타적 집합 정의
+class DisjointSet {
+private:
+    vector<int> parent, rank;
+public:
+    DisjointSet(int size) : parent(size, -1), rank(size, 0) {}
+    int find(int node);                     // 경로 압축을 하면서 루트 노드 찾기
+    void merge(int node1, int node2);       // 랭크 기반으로 두 집합 합치기
+    bool isCycle(int node1, int node2);     // 간츤 집합에 있는지 확인
+};
+
+int DisjointSet::find(int node){
+    if(parent[node] == -1){
         return node;
-    } else{
-        // 부모를 재귀적으로 찾고 경로 압축
-        return tree[node] = getParent(tree, tree[node]);
+    }
+    return parent[node] = find(parent[node]);
+}
+
+void DisjointSet::merge(int node1, int node2){
+    int root1 = find(node1);
+    int root2 = find(node2);
+    
+    if(root1 != root2){
+        if(rank[root1] > rank[root2]){
+            parent[root2] = root1;
+        } else if(rank[root1] < rank[root2]){
+            parent[root1] = root2;
+        } else{
+            parent[root2] = root1;
+            rank[root1]++;
+        }
     }
 }
 
-// 간선을 비용 기준으로 오름차순 정렬하기 위한 비교 함수
-bool cmp(vector<int> a, vector<int> b){
-    return a[2] < b[2];
+bool DisjointSet::isCycle(int node1, int node2){
+    return find(node1) == find(node2);
 }
 
 int solution(int n, vector<vector<int>> costs) {
     int answer = 0;
     
-    // 각 노드를 자신을 부모로 초기화 (Disjoint Set 초기화)
-    vector<int> tree(101);
-    for(int i = 0; i < n; i++){
-        tree[i] = i;
-    }
+    // 비용을 기준으로 간선 정렬
+    sort(costs.begin(), costs.end(),
+        [](const vector<int>& a, const vector<int>& b){ return a[2] < b[2]; });
     
-    // 모든 간선을 비용 기준으로 정렬
-    sort(costs.begin(), costs.end(), cmp);
+    DisjointSet disjointSet(n);
     
-    // 정렬된 간선들을 순회하며 MST 구성
-    for(vector<int> cost : costs){
-        // 현재 간선의 두 노드와 비용
-        int start = getParent(tree, cost[0]);  // 시작 노드의 루트 부모
-        int end = getParent(tree, cost[1]);    // 끝 노드의 루트 부모
-        int weight = cost[2];                  // 간선의 가중치(비용)
+    for(const auto& edge : costs){
+        int node1 = edge[0];
+        int node2 = edge[1];
+        int cost = edge[2];
         
-        // 두 노드가 서로 연결되어 있지 않다면 (사이클이 아니라면)
-        if(start != end){
-            tree[end] = start;      // 두 집합을 합침 (Union)
-            answer += weight;       // 간선의 비용을 결과에 더함
+        // 사이클을 확인 후 없으면 합병
+        if(!disjointSet.isCycle(node1, node2)){
+            disjointSet.merge(node1, node2);
+            answer += cost;
         }
     }
+
     
     return answer;
 }
