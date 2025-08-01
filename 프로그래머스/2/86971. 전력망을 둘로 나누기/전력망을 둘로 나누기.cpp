@@ -1,55 +1,46 @@
 #include <string>
 #include <vector>
-#include <algorithm>
-
-#include <iostream>
-
 using namespace std;
 
-// wires를 for문으로 해서 반복 -> 해당 지점에서 해당 wire제거
-// 1번부터 연결된 개수 파악 -> DFS ( visited 활용 )
-// 파악한 개수 x -> | 2x - n | 의 최솟값 반환
-
-// DFS로 연결된 노드 개수 계산
-int dfs(int node, vector<vector<int>> connect, vector<bool>& visited) {
+// dfs 함수
+int dfs(vector<vector<int>>& graph, vector<bool>& visited, vector<int>& count, int node){
+    // 현재 노드를 방문한 목록과 방문한 경로 추가
     visited[node] = true;
-    int count = 1;
+    int subTreeSize = 1;
 
-    for (int neighbor : connect[node]) {
-        if (!visited[neighbor]) {
-            count += dfs(neighbor, connect, visited);
+    // 현재 노드와 인접한 노드 중, 방문하지 않은 노드에 dfs 계속 진행
+    for(int neighbor : graph[node]){
+        if(!visited[neighbor]){
+            subTreeSize += dfs(graph, visited, count, neighbor);
         }
     }
-    return count;
+    
+    count[node] = subTreeSize;
+    return subTreeSize;
 }
 
 int solution(int n, vector<vector<int>> wires) {
-    int answer = 100;
+    int answer = n;
     
-    vector<vector<int>> connect(n + 1);
+    vector<vector<int>> graph(n);     // 인접 리스트
+    vector<bool> visited(n, false);   // 방문 여부를 저장할 배열
+    vector<int> count(n, 0);          // 하위 노드의 개수를 저장할 배열
+    
+    // 인접 리스트 초기화
     for(vector<int> wire : wires){
-        connect[wire[0]].push_back(wire[1]);
-        connect[wire[1]].push_back(wire[0]);
+        int u = wire[0] - 1;
+        int v = wire[1] - 1;
+        graph[u].push_back(v);
+        graph[v].push_back(u);
     }
     
-    for(vector<int> wire : wires){
-        
-        // 간선 제거
-        connect[wire[0]].erase(remove(connect[wire[0]].begin(), connect[wire[0]].end(), wire[1]), connect[wire[0]].end());
-        connect[wire[1]].erase(remove(connect[wire[1]].begin(), connect[wire[1]].end(), wire[0]), connect[wire[1]].end());
-
-        // 그룹 크기 계산
-        vector<bool> visited(n + 1, false);
-        int group1 = dfs(1, connect, visited);
-        int group2 = n - group1;
-        
-        // 최소 차이 갱신
-        answer = min(answer, abs(group1 - group2));
-        
-        // 간선 복구
-        connect[wire[0]].push_back(wire[1]);
-        connect[wire[1]].push_back(wire[0]);
-    }  
+    // dfs를 통해 하위 노드의 개수 계산
+    dfs(graph, visited, count, 0);
     
+    // 하위 노드의 개수 / 2가 가장 낮은 수 계산
+    for(int num : count){
+        answer = min(abs(n - 2 * num), answer);
+    }
+
     return answer;
 }
