@@ -10,10 +10,9 @@ int solution(vector<int> d, int budget) {
     
     // 예산이 적은 순서로 지원
     for(int i : d){
-        if(i <= budget){
-            answer++;
-            budget -= i;
-        }
+        if(budget < i) break;
+        answer++;
+        budget -= i;
     }
     
     return answer;
