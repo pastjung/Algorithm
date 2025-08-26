@@ -3,22 +3,19 @@
 using namespace std;
 
 int bottom_up(vector<vector<int>> board){
-    int maxLen = 0;
+    int ROW = board.size(), COL = board[0].size();
     
-    for(int i = 0; i < board.size(); i++){
-        maxLen = max(maxLen, board[i][0]);
-    }
-    for(int i = 0; i < board[0].size(); i++){
-        maxLen = max(maxLen, board[0][i]);
-    }
-    
-    for(int i = 1; i < board.size(); i++){
-        for(int j = 1; j < board[i].size(); j++){
+    for(int i = 1; i < ROW; i++){
+        for(int j = 1; j < COL; j++){
             if(board[i][j] == 0) continue;
             board[i][j] = min({board[i - 1][j], board[i][j - 1], board[i - 1][j - 1]}) + 1;
-            maxLen = max(maxLen, board[i][j]);
         }
     }
+    
+    int maxLen = 0;
+    for(const auto& row : board){
+        maxLen = max(maxLen, *max_element(row.begin(), row.end()));
+    }    
     return maxLen;
 }
 
