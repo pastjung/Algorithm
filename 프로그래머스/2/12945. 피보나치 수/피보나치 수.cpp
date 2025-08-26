@@ -1,21 +1,15 @@
 #include <vector>
 using namespace std;
 
-// top-down 방식의 dp 구현
-int top_down(int n, vector<int>& dp){
-    if(dp[n] != -1){
-        return dp[n];
+// bottom-up 방식의 dp 구현
+int bottom_up(int n){
+    vector<int> dp = {0, 1};
+    for(int i = 2; i <= n; i++){
+        dp.push_back((dp[i - 1] + dp[i - 2]) % 1234567);
     }
-    dp[n] = (top_down(n - 1 ,dp) + top_down(n - 2 ,dp)) % 1234567; 
     return dp[n];
 }
 
 int solution(int n) {
-    int answer = 0;
-    vector<int> dp(n + 1, -1);
-    dp[0] = 0;
-    dp[1] = 1;
-    
-    answer = top_down(n, dp);
-    return answer;
+    return bottom_up(n);
 }
