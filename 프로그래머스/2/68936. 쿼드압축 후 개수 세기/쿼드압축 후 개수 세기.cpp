@@ -24,33 +24,22 @@ bool checkSum(const vector<vector<int>>& arr, int x, int y, int n){
 
 // 백트래킹
 void backtracking(const vector<vector<int>>& arr, vector<int>& answer, int x, int y, int n){
-    // 기저 조건 : 정사각형의 길이가 1인 경우
-    if(n == 1){
-        return;
-    }
-    
     // 현재 위치의 모든 정사각형의 값이 일치하는지 확인 -> 일치하는 경우 현재 위치의 모든 0또는 1을 하나로 병합
     if(checkSum(arr, x, y, n)){
-        answer[arr[y][x]] -= n * n - 1;
+        answer[arr[y][x]]++;
         return;
     }
     
     // 4개의 정사각형으로 쪼갠 후 다음 선택지 탐색
-    backtracking(arr, answer, x, y, n / 2);
-    backtracking(arr, answer, x + (n / 2), y, n / 2);
-    backtracking(arr, answer, x, y + (n / 2), n / 2);
-    backtracking(arr, answer, x + (n / 2), y + (n / 2), n / 2);
+    int half = n / 2;
+    backtracking(arr, answer, x, y, half);
+    backtracking(arr, answer, x + half, y, half);
+    backtracking(arr, answer, x, y + half, half);
+    backtracking(arr, answer, x + half, y + half, half);
 }
 
 vector<int> solution(vector<vector<int>> arr) {
     vector<int> answer = {0, 0};
-    
-    // arr의 0과 1의 개수 파악
-    for(vector<int> i : arr){
-        for(int j : i){
-            answer[j]++;
-        }
-    }
     backtracking(arr, answer, 0, 0, arr.size());  // 백트래킹 수행
     return answer;
 }
