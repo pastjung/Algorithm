@@ -31,8 +31,8 @@ int solution(int n, int k) {
         if(remain == 0){
             if(number != "" && isPrime(stoll(number))){
                 answer++;
-                number = "";
             }
+            number = "";
         } else {
             number = to_string(remain) + number;
         }
@@ -40,7 +40,7 @@ int solution(int n, int k) {
     // P or 0P 인 경우
     if(number != ""){
         if(isPrime(stoll(number))){
-            answer++;    
+            answer++;
         }   
     }
     
