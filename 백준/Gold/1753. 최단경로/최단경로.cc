@@ -1,57 +1,79 @@
 #include <iostream>
 #include <vector>
 #include <queue>
-#include <algorithm>
 #include <climits>
 using namespace std;
 
-vector<int> dijkstra(int start, vector<vector<pair<int,int>>>& edges){
-    int n = edges.size();
-    vector<int> distance(n, INT_MAX);
-    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<>> pq;  // {거리, 정점};
+/* 문제 분석
+- 문제 설명
+    - 방향 그래프 : 주어진 시작점에서 다른 모든 정점으로의 최단 경로 구하기
+    - i번째 줄에 i번 정점으로의 최단 경로의 값 출력 ( 시작점은 자신은 0으로 출력, 경로가 없으면 INF 출력 )
+- 입력 데이터
+    - 정점의 개수 V
+    - 간선의 개수 E
+    - 시작 정점 K
+    - 간선 + 가중치 : 모든 가중치는 10 이하의 가중치
+- 핵심 키워드
+    - 양의 가중치 & 최단 경로 -> 다익스트라
+*/
 
-    distance[start] = 0;
-    pq.push({0, start});
+void Dijkstra(const vector<vector<pair<int,int>>>& weight, vector<int>& distance, const int K){
+    int n = weight.size();
+    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<>> pq;  // {누적 가중치, 도착 정점}
+
+    // 초기 세팅
+    distance[K] = 0;
+    pq.push({0, K});
 
     while(!pq.empty()){
-        auto[dist, now] = pq.top();
+        int wSum = pq.top().first;
+        int start = pq.top().second;
         pq.pop();
 
-        // 이미 처리된 정점이면 무시
-        if(dist > distance[now]) continue;
+        // 현재 경로가 기존에 찾은 경로보다 가중치가 작은 긴 경우 패스
+        if(wSum > distance[start]){
+            continue;
+        }
 
-        for(const auto& edge : edges[now]){
-            int cost = dist + edge.second;
-            if(cost < distance[edge.first]){
-                distance[edge.first] = cost;
-                pq.push({cost, edge.first});
+        // 인근 경로 탐색
+        for(const auto& [end, w] : weight[start]){
+            int cost = distance[start] + w;
+            if(cost < distance[end]){
+                distance[end] = cost;
+                pq.push({cost, end});
             }
         }
     }
-    return distance;
 }
 
 int main() {
-    ios_base::sync_with_stdio(0);
-    cin.tie(0); cout.tie(0);
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
 
+    // 입력 데이터
     int V, E, K;
     cin >> V >> E >> K;
-    
-    vector<vector<pair<int,int>>> edges(V + 1);
+
+    vector<vector<pair<int,int>>> weight(V);  // 출발 정점 : {도착 정점, 가중치}
     for(int e = 0; e < E; e++){
-        int u, v, w;
-        cin >> u >> v >> w;
-        edges[u].push_back({v, w});
+        int start, end, w;
+        cin >> start >> end >> w;
+        weight[start-1].push_back({end-1, w});
     }
 
-    vector<int> answer = dijkstra(K, edges);
-    for(int i = 1; i <= V; ++i){
-        if(answer[i] == INT_MAX){
+    // K부터 각 정점의 최단 경로 계산
+    vector<int> distance(V, INT_MAX);  // 각 정점의 최단 경로    
+    Dijkstra(weight, distance, K - 1);
+
+    // 모든 최단 경로 출력
+    for(int w : distance){
+        if(w == INT_MAX){
             cout << "INF\n";
         } else{
-            cout << answer[i] << '\n';
+            cout << w << "\n";
         }
     }
+    
     return 0;
 }
