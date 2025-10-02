@@ -1,45 +1,60 @@
+#include <string>
 #include <vector>
-#include <unordered_set>
+#include <algorithm>
 using namespace std;
 
-// find 함수 ( 경로 압축 )
-int find(vector<int>& parent, int x){
-    if(parent[x] != x){
-        parent[x] = find(parent, parent[x]);  // 경로 압축
+vector<int> parents;    // 각 컴퓨터의 상위 컴퓨터를 저장할 배열
+vector<int> ranks;      // 각 네트워크의 랭크
+
+// find 함수
+int find(int x){
+    if(parents[x] != x){
+        parents[x] = find(parents[x]);
     }
-    return parent[x];
+    return parents[x];
 }
 
-// unionSet 함수
-void unionSet(vector<int>& parent, int a, int b){
-    int rootA = find(parent, a);
-    int rootB = find(parent, b);
-    if(rootA != rootB){
-        parent[rootB] = rootA;
+// union 함수 -> rank 고려
+void unionSet(int x, int y){
+    int rootX = find(x);
+    int rootY = find(y);
+    
+    if(rootX != rootY){
+        if(ranks[rootX] < ranks[rootY]){
+            parents[rootX] = rootY;
+        } else if(ranks[rootX] > ranks[rootY]){
+            parents[rootY] = rootX;
+        } else{
+            parents[rootY] = rootX;
+            ranks[rootX]++;
+        }
     }
 }
 
 int solution(int n, vector<vector<int>> computers) {
-    // 부모 배열 생성 및 초기화
-    vector<int> parent(n);
+    parents.assign(n, 0);
+    ranks.assign(n, 0);
+    
     for(int i = 0; i < n; i++){
-        parent[i] = i;
+        parents[i] = i;
     }
     
-    // 모든 노드 Union
+    // 상위 컴퓨터 정보 저장 -> 0 ~ n-1까지 저장
     for(int i = 0; i < n; i++){
-        for(int j = 0; j < n; j++){
-            if(i != j && computers[i][j] == 1){
-                unionSet(parent, i, j);
+        for(int j = 0; j <= i; j++){
+            if(computers[i][j] == 1){
+                unionSet(i, j);
             }
         }
     }
     
-    // 네트워크 개수 계산
-    unordered_set<int> networks;
+    // 대표 노드로 갱신
     for(int i = 0; i < n; i++){
-        networks.insert(find(parent, i));
+        parents[i] = find(i);
     }
     
-    return networks.size();
+    // 각 네트워크의 중복 제거
+    sort(parents.begin(), parents.end());
+    parents.erase(unique(parents.begin(), parents.end()), parents.end());
+    return parents.size();
 }
