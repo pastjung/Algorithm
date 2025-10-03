@@ -2,8 +2,10 @@
 #include <algorithm>
 using namespace std;
 
+vector<vector<int>> adjList;
+
 // dfs
-void dfs(vector<int>& info, vector<vector<int>>& adjList, vector<int> canGo, int& answer, int sheep, int wolf, int cur){
+void dfs(vector<int>& info, vector<int> canGo, int& answer, int sheep, int wolf, int cur){
     if(info[cur] == 0){
         sheep++;
     } else{
@@ -24,7 +26,7 @@ void dfs(vector<int>& info, vector<vector<int>>& adjList, vector<int> canGo, int
     }
 
     for (int next : nextCanGo) {
-        dfs(info, adjList, nextCanGo, answer, sheep, wolf, next);
+        dfs(info, nextCanGo, answer, sheep, wolf, next);
     }
 }
 
@@ -33,13 +35,13 @@ int solution(vector<int> info, vector<vector<int>> edges) {
     int n = info.size();
     
     // 연결 정보를 저장할 연결 리스트 생성 및 초기화
-    vector<vector<int>> adjList(n);
+    adjList.assign(n, {});
     for(vector<int> edge : edges){
         adjList[edge[0]].push_back(edge[1]);
     }
     
     vector<int> canGo = {0};
-    dfs(info, adjList, canGo, answer, 0, 0, 0);
+    dfs(info, canGo, answer, 0, 0, 0);
     
     return answer;
 }
