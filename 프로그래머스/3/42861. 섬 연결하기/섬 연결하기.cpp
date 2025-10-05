@@ -3,65 +3,55 @@
 #include <algorithm>
 using namespace std;
 
-// 상호배타적 집합 정의
-class DisjointSet {
-private:
-    vector<int> parent, rank;
-public:
-    DisjointSet(int size) : parent(size, -1), rank(size, 0) {}
-    int find(int node);                     // 경로 압축을 하면서 루트 노드 찾기
-    void merge(int node1, int node2);       // 랭크 기반으로 두 집합 합치기
-    bool isCycle(int node1, int node2);     // 간츤 집합에 있는지 확인
-};
+/* 문제 분석
+- 문제 설명
+    - 최소의 비용으로 모든 섬이 서로 통행 가능하도록 만들 때 필요한 최소 비용 구하기
+    - 양방향 통행 가능
+- 입력 데이터
+    - 섬의 개수 n
+    - 섬 사이 통행 비용 costs
+- 핵심 키워드
+    - 양의 가중치 & 시작 지점 불분명 -> 크루스칼
+*/
 
-int DisjointSet::find(int node){
-    if(parent[node] == -1){
-        return node;
+bool cmp(vector<int> e1, vector<int> e2){
+    return e1[2] < e2[2];
+}
+
+vector<int> parents;
+
+int find(int x){
+    if(parents[x] != x){
+        parents[x] = find(parents[x]);
     }
-    return parent[node] = find(parent[node]);
+    return parents[x];
 }
 
-void DisjointSet::merge(int node1, int node2){
-    int root1 = find(node1);
-    int root2 = find(node2);
-    
-    if(root1 != root2){
-        if(rank[root1] > rank[root2]){
-            parent[root2] = root1;
-        } else if(rank[root1] < rank[root2]){
-            parent[root1] = root2;
-        } else{
-            parent[root2] = root1;
-            rank[root1]++;
-        }
+bool unionSet(int x, int y){
+    int rootX = find(x);
+    int rootY = find(y);
+    if(rootX != rootY){
+        parents[rootY] = rootX;
+        return true;
     }
+    return false;
 }
 
-bool DisjointSet::isCycle(int node1, int node2){
-    return find(node1) == find(node2);
-}
-
+// kruscal 알고리즘
 int solution(int n, vector<vector<int>> costs) {
     int answer = 0;
     
-    // 비용을 기준으로 간선 정렬
-    sort(costs.begin(), costs.end(),
-        [](const vector<int>& a, const vector<int>& b){ return a[2] < b[2]; });
+    parents.assign(n, 0);
+    for(int i = 0; i < n; i++){
+        parents[i] = i;
+    }
     
-    DisjointSet disjointSet(n);
+    sort(costs.begin(), costs.end(), cmp);
     
-    for(const auto& edge : costs){
-        int node1 = edge[0];
-        int node2 = edge[1];
-        int cost = edge[2];
-        
-        // 사이클을 확인 후 없으면 합병
-        if(!disjointSet.isCycle(node1, node2)){
-            disjointSet.merge(node1, node2);
-            answer += cost;
+    for(vector<int> cost : costs){
+        if(unionSet(cost[0], cost[1])){
+            answer += cost[2];
         }
     }
-
-    
     return answer;
 }
