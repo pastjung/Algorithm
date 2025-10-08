@@ -4,17 +4,16 @@ using namespace std;
 
 int solution(vector<vector<int>> board, vector<vector<int>> skill) {
     int answer = 0;
+    
     int n = board.size(), m = board[0].size();
+    vector<vector<int>> diff(n + 1, vector<int> (m + 1, 0));
     
-    // (N+1) * (M+1) 사이즈 배열 보드 생성
-    vector<vector<int>> diff(n + 1, vector<int>(m + 1, 0));
-    
-    // sill의 각 모서리 마킹
+    // skill 적용
     for(vector<int> s : skill){
         int degree = s[0] == 1 ? -s[5] : s[5];
         diff[s[1]][s[2]] += degree;
-        diff[s[1]][s[4] + 1] += -degree;
         diff[s[3] + 1][s[2]] += -degree;
+        diff[s[1]][s[4] + 1] += -degree;
         diff[s[3] + 1][s[4] + 1] += degree;
     }
     
@@ -28,11 +27,11 @@ int solution(vector<vector<int>> board, vector<vector<int>> skill) {
     // 각 열의 누적합 계산
     for(int j = 0; j < m; j++){
         for(int i = 1; i < n; i++){
-            diff[i][j] += diff[i-1][j];
+            diff[i][j] += diff[i - 1][j];
         }
     }
     
-    // 부서지지 않은 건물의 개수 계산
+    // 부서지지 않은 건물의 수 계산
     for(int i = 0; i < n; i++){
         for(int j = 0; j < m; j++){
             if(board[i][j] + diff[i][j] > 0){
