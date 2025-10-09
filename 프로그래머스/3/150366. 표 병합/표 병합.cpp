@@ -117,6 +117,7 @@ vector<string> solution(vector<string> commands) {
             pair<int, int> root = find({r, c});
             string rootStr = table[root.first][root.second];
             
+            // 병합 해제할 셀 탐색
             vector<pair<int, int>> to_unmerge;
             for(int i = 1; i < SIZE; i++){
                 for(int j = 1; j < SIZE; j++){
@@ -125,6 +126,7 @@ vector<string> solution(vector<string> commands) {
                     }
                 }
             }
+            // 병합 해제
             for (auto const& cell : to_unmerge) {
                 parents[cell.first][cell.second] = cell;
                 table[cell.first][cell.second] = "EMPTY";
