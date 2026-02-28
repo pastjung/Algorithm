@@ -84,8 +84,8 @@ def mst():
                 
         return total_weights
 
-    return int(kruskal(V, edges) + 0.5)
-    # return int(prim(1, V, edges) + 0.5)
+    # return int(kruskal(V, edges) + 0.5)
+    return int(prim(1, V, edges) + 0.5)
 
 T = int(input())
 for tc in range(1, T+1):
